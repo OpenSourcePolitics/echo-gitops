@@ -67,7 +67,7 @@ apiServer:
   replicaCount: 2
   maxReplicaCount: 2
   image:
-    repository: "dbr-echo-server"
+    repository: "dbr-server"
   service:
     port: 8000
   resources:
@@ -82,7 +82,7 @@ worker:
   replicaCount: 3
   maxReplicaCount: 3
   image:
-    repository: "dbr-echo-server"
+    repository: "dbr-server"
   resources:
     requests:
       cpu: "500m"
@@ -95,7 +95,7 @@ workerCpu:
   replicaCount: 3
   maxReplicaCount: 3
   image:
-    repository: "dbr-echo-server"
+    repository: "dbr-server"
   resources:
     requests:
       cpu: "1"
@@ -108,7 +108,7 @@ workerScheduler:
   replicaCount: 1
   maxReplicaCount: 1
   image:
-    repository: "dbr-echo-server"
+    repository: "dbr-server"
   resources:
     requests:
       cpu: "500m"
