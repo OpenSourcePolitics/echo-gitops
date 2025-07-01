@@ -1,14 +1,7 @@
 # Instructions:
 
 # before running terraform apply, run:
-# terraform workspace show 
-# for dev: terraform workspace select default
-# for prod: terraform workspace select -or-create prod 
-# use different .tfvars if needed
-
-# terraform workspace select default
-# terraform plan -var-file=./terraform.tfvars
-# terraform apply -var-file=./terraform.tfvars
+# for prod: terraform workspace select -or-create prod
 
 # terraform workspace select prod
 # terraform plan -var-file=./terraform-prod.tfvars
@@ -25,13 +18,6 @@
 
 secrets:
 
-kubeseal --context=do-ams3-dbr-echo-dev-k8s-cluster \
-  --controller-namespace=kube-system \
-  --controller-name=sealed-secrets \
-  < dev.yaml > echo-backend-secrets-dev.yaml
-
-kubectl apply -f echo-backend-secrets-dev.yaml
-
 kubeseal --context=do-ams3-dbr-echo-prod-k8s-cluster \
   --controller-namespace=kube-system \
   --controller-name=sealed-secrets \
@@ -43,7 +29,6 @@ kubectl apply -f echo-backend-secrets-prod.yaml
 
 # argo:
 
-# kubectl apply -f echo-dev.yaml
 # kubectl apply -f echo-prod.yaml
 
 # kubectl port-forward svc/argocd-server -n argocd 8080:443
@@ -54,8 +39,6 @@ kubectl apply -f echo-backend-secrets-prod.yaml
 # ingress: 
 
 # ingress is already through do-loadbalancer therefore, grab the ip from the console and point your domain to it
-
-# vercel:
 
 # manually and add the environment variables
 
@@ -75,13 +58,13 @@ resource "digitalocean_kubernetes_cluster" "doks" {
   name     = "dbr-echo-${local.env}-k8s-cluster"
   region   = var.do_region
   vpc_uuid = digitalocean_vpc.echo_vpc.id
-  version  = "1.32.2-do.0"
+  version  = "1.33.1-do.0"
   node_pool {
     name       = "default-pool"
     size       = "s-4vcpu-8gb" # 4vCPU 8GB nodes
     auto_scale = true
-    min_nodes  = local.env == "prod" ? 2 : 1 # prod : dev
-    max_nodes  = local.env == "prod" ? 6 : 3 # prod : dev
+    min_nodes  = local.env == "prod" ? 1 : 1 # prod : dev
+    max_nodes  = local.env == "prod" ? 3 : 3 # prod : dev
     tags       = ["dbr-echo", local.env]
   }
 }
@@ -112,20 +95,19 @@ resource "digitalocean_database_connection_pool" "postgres_pool" {
   user = digitalocean_database_cluster.postgres.user
 }
 
-resource "digitalocean_database_cluster" "redis" {
-  name                 = "dbr-echo-${local.env}-redis"
+resource "digitalocean_database_cluster" "valkey" {
+  name                 = "dbr-echo-${local.env}-valkey"
   private_network_uuid = digitalocean_vpc.echo_vpc.id
-  engine               = "redis"
-  version              = "7" # Redis version
-  size                 = local.env == "prod" ? "db-s-2vcpu-4gb" : "db-s-1vcpu-1gb"
-  eviction_policy      = local.env == "prod" ? "volatile_lru" : "volatile_lru"
+  engine               = "valkey"
+  version              = "8" # Valkey version
+  size                 = local.env == "prod" ? "db-s-1vcpu-1gb" : "db-s-1vcpu-1gb"
   region               = var.do_region
   node_count           = 1
-  tags                 = ["dbr-echo", local.env, "redis"]
+  tags                 = ["dbr-echo", local.env, "valkey"]
 }
 
 resource "digitalocean_spaces_bucket" "uploads" {
-  name   = "dbr-echo-${local.env}-uploads"
+  name   = "dbr-echo-${local.env}-uploads-osp"
   region = var.do_region
 
   lifecycle {
@@ -134,10 +116,9 @@ resource "digitalocean_spaces_bucket" "uploads" {
 }
 
 resource "digitalocean_container_registry" "registry" {
-  # already created in dev
-  count = local.env == "prod" ? 0 : 1
+  count = 1
 
-  name                   = "dbr-cr"
+  name                   = "dbr-cr-osp"
   subscription_tier_slug = "basic"
   region                 = var.do_region
 }
@@ -147,7 +128,7 @@ data "digitalocean_container_registry" "shared_registry" {
 }
 
 resource "digitalocean_container_registry_docker_credentials" "registry_credentials" {
-  registry_name = local.env == "prod" ? data.digitalocean_container_registry.shared_registry.name : digitalocean_container_registry.registry[0].name
+  registry_name = digitalocean_container_registry.registry[0].name
 }
 
 resource "time_sleep" "wait_for_kubernetes" {
