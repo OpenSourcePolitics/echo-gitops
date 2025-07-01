@@ -7,10 +7,10 @@ common:
   env:
     # Core application config
     DEBUG_MODE: "0"
-    DIRECTUS_BASE_URL: "https://directus.dembrane.com"
-    ADMIN_BASE_URL: "https://dashboard.dembrane.com"
-    PARTICIPANT_BASE_URL: "https://portal.dembrane.com"
-    API_BASE_URL: "https://api.dembrane.com/api"
+    DIRECTUS_BASE_URL: "https://directus.osp.dev"
+    ADMIN_BASE_URL: "https://dashboard.osp.dev"
+    PARTICIPANT_BASE_URL: "https://portal.osp.dev"
+    API_BASE_URL: "https://api.osp.dev/api"
     NEO4J_URI: "bolt://echo-neo4j:7687"
     NEO4J_USERNAME: "neo4j"
     DISABLE_CORS: "0"
@@ -52,16 +52,16 @@ directus:
       cpu: "1"
       memory: "1536Mi"
   env:
-    PUBLIC_URL: "https://directus.dembrane.com"
-    CORS_ORIGIN: "https://dashboard.dembrane.com,https://portal.dembrane.com"
+    PUBLIC_URL: "https://directus.osp.dev"
+    CORS_ORIGIN: "https://dashboard.osp.dev,https://portal.osp.dev"
     SESSION_COOKIE_NAME: "dembrane_session_token"
-    SESSION_COOKIE_DOMAIN: "dembrane.com"
-    USER_REGISTER_URL_ALLOW_LIST: "https://dashboard.dembrane.com/verify-email"
-    PASSWORD_RESET_URL_ALLOW_LIST: "https://dashboard.dembrane.com/password-reset"
-    USER_INVITE_URL_ALLOW_LIST: "https://dashboard.dembrane.com/invite"
+    SESSION_COOKIE_DOMAIN: "osp.dev"
+    USER_REGISTER_URL_ALLOW_LIST: "https://dashboard.osp.dev/verify-email"
+    PASSWORD_RESET_URL_ALLOW_LIST: "https://dashboard.osp.dev/password-reset"
+    USER_INVITE_URL_ALLOW_LIST: "https://dashboard.osp.dev/invite"
     AUTH_GOOGLE_ALLOW_PUBLIC_REGISTRATION: "false"
     AUTH_GOOGLE_DEFAULT_ROLE_ID: 2446660a-ab6c-4801-ad69-5711030cba83
-    AUTH_GOOGLE_REDIRECT_ALLOW_LIST: "https://dashboard.dembrane.com/en-US/projects,https://dashboard.dembrane.com/nl-NL/projects,https://dashboard.dembrane.com/es-ES/projects,https://dashboard.dembrane.com/fr-FR/projects,https://dashboard.dembrane.com/de-DE/projects"
+    AUTH_GOOGLE_REDIRECT_ALLOW_LIST: "https://dashboard.osp.dev/en-US/projects,https://dashboard.osp.dev/nl-NL/projects,https://dashboard.osp.dev/es-ES/projects,https://dashboard.osp.dev/fr-FR/projects,https://dashboard.osp.dev/de-DE/projects"
 
 apiServer:
   replicaCount: 2
@@ -138,20 +138,20 @@ neo4j:
 ingress:
   enabled: true
   className: "nginx"
-  email: "admin@dembrane.com"
+  email: "cloud@opensourcepolitics.eu"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
   clusterIssuerName: "letsencrypt-prod"
-  domain: "dembrane.com"
+  domain: "osp.dev"
   hosts:
-    directus: "directus.dembrane.com"
-    api: "api.dembrane.com"
+    directus: "directus.osp.dev"
+    api: "api.osp.dev"
   tls:
     - secretName: "echo-tls"
       hosts:
-        - "directus.dembrane.com"
-        - "api.dembrane.com"
+        - "directus.osp.dev"
+        - "api.osp.dev"
 
 storage:
   storageClassName: "do-block-storage"
