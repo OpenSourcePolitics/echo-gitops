@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/dembrane/echo-gitops.git
+    repoURL: https://github.com/OpenSourcePolitics/echo-gitops.git
     targetRevision: HEAD
     path: helm/monitoring
     helm:
