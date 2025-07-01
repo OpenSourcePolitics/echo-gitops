@@ -1,6 +1,6 @@
 global:
-  imageTag: "657623927b22168f0aae4b58dadb9efe3ae9e50e"
-  registry: "registry.digitalocean.com/dbr-cr"
+  imageTag: "1.6.4"
+  registry: "registry.digitalocean.com/dbr-cr-osp"
 
 # Common configuration shared across services - Production overrides
 common:
